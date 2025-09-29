@@ -1,4 +1,5 @@
 services:
+  #Database
   mongodb:
     image: 'mongo:latest'
     environment:
@@ -7,3 +8,29 @@ services:
       - 'MONGO_INITDB_ROOT_USERNAME=root'
     ports:
       - '27017'
+
+  #Monitoring
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-server_bitData
+    ports:
+      - "9095:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana_bitData
+    ports:
+      - "3003:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+  
+volumes:
+  grafana_data:
+    
