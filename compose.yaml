@@ -44,7 +44,7 @@ services:
     image: confluentinc/cp-kafka:7.7.0
     container_name: kafka_bitData
     ports:
-      - "9099:9092"
+      - "7075:9092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
