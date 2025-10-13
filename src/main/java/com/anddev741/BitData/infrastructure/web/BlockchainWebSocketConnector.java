@@ -8,21 +8,18 @@ import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClien
 
 import com.anddev741.BitData.domain.port.in.ReceiveTransactionsPort;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class BlockchainWebSocketConnector implements ReceiveTransactionsPort {
 
-    private final ReactorNettyWebSocketClient client = new ReactorNettyWebSocketClient(); 
+    private final ReactorNettyWebSocketClient client; 
     private final String BLOCKCHAIN_URI = "wss://ws.blockchain.info/inv";
-
-    @SuppressWarnings("deprecation")
-    public BlockchainWebSocketConnector() {
-        client.setMaxFramePayloadLength(2 * 1024 * 1024);
-    }
 
     @Override
     public Flux<String> receiveUnconfirmedTransactions() {
@@ -31,7 +28,7 @@ public class BlockchainWebSocketConnector implements ReceiveTransactionsPort {
 
             client.execute(URI.create(BLOCKCHAIN_URI), session -> {
                 return session.send(
-                    Mono.just(session.textMessage("{\"op\":\"unconfirmed_sub\"}"))
+                    Mono.fromCallable(() -> session.textMessage("{\"op\":\"unconfirmed_sub\"}"))
                 )
                 .thenMany(
                     session.receive()
