@@ -1,12 +1,14 @@
 package com.anddev741.BitData.infrastructure.web;
 
 import java.net.URI;
+import java.time.Duration;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
 
 import com.anddev741.BitData.domain.port.in.ReceiveTransactionsPort;
+import com.anddev741.BitData.infrastructure.config.WebSocketMetrics;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +22,25 @@ public class BlockchainWebSocketConnector implements ReceiveTransactionsPort {
 
     private final ReactorNettyWebSocketClient client; 
     private final String BLOCKCHAIN_URI = "wss://ws.blockchain.info/inv";
+    private final WebSocketMetrics metrics;
 
     @Override
     public Flux<String> receiveUnconfirmedTransactions() {
+        return Flux.defer(this::connectToBlockchain)
+            .onErrorResume(error -> {
+                log.warn("[WEB] Error detected, retrying in 5 seconds...", error);
+
+                metrics.incrementWebSocketRetries();
+
+                return Mono.delay(Duration.ofSeconds(5))
+                    .thenMany(receiveUnconfirmedTransactions());
+            })
+            .doOnComplete(() -> {
+                log.info("[WEB] Connection completed, restarting in 5 seconds...");
+            });
+    }
+
+    private Flux<String> connectToBlockchain() {
         return Flux.create(sink -> {
             log.info("[WEB] Connecting to Blockchain WebSocket...");
 
@@ -35,7 +53,10 @@ public class BlockchainWebSocketConnector implements ReceiveTransactionsPort {
                         .map(WebSocketMessage::getPayloadAsText)
                         .doOnNext(sink::next)
                         .doOnError(sink::error)
-                        .doOnComplete(sink::complete)   
+                        .doOnComplete(() -> {
+                            log.info("[WEB] WebSocket connection closed");
+                            sink.complete();
+                        })
                 )
                 .then();
             })
