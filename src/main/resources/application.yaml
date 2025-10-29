@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: BitData
+  cloud:
+    function:
+      definition: sendUnconfirmedTransactions;processTransactions
+    stream:
+      bindings:
+        sendUnconfirmedTransactions-out-0:
+          destination: processTransactions
+          contentType: application/json
+
+        processTransactions-in-0:
+          destination: processTransactions
+          contentType: application/json
+
+      kafka:
+        binder:
+          brokers: kafka:9092
+          autoCreateTopics: true
+
+server:
+  port: 7070
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, metrics, health
+      base-path: /actuator
+  endpoint:
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.stream: DEBUG
+    org.springframework.kafka: DEBUG
