@@ -30,7 +30,7 @@ public class WebSocketMetrics {
         
     }
 
-    public void incrementUnconfirmed() {
+    public void incrementUnconfirmedTransaction() {
         unconfirmedTransactionsReceived.increment();
     }
 
