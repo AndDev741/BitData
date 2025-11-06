@@ -1,4 +1,4 @@
-package com.anddev741.BitData.domain.model;
+package com.anddev741.BitData.domain.model.UnconfirmedTransaction;
 
 import java.util.List;
 

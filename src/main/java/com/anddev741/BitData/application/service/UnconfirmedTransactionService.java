@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import com.anddev741.BitData.domain.model.UnconfirmedTransaction;
+import com.anddev741.BitData.domain.model.UnconfirmedTransaction.UnconfirmedTransaction;
 import com.anddev741.BitData.infrastructure.config.WebSocketMetrics;
 import com.anddev741.BitData.infrastructure.web.BlockchainWebSocketConnector;
 import com.fasterxml.jackson.core.JsonProcessingException;
