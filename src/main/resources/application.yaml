@@ -18,6 +18,9 @@ spring:
         binder:
           brokers: kafka:9092
           autoCreateTopics: true
+  data:
+    mongodb:
+      uri: mongodb://root:secret@mongodb:27017/mydatabase?authSource=admin
 
 server:
   port: 7070
