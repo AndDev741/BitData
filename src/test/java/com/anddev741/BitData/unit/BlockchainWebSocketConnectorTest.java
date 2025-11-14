@@ -17,7 +17,7 @@ import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.WebSocketSession;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
 
-import com.anddev741.BitData.infrastructure.config.WebSocketMetrics;
+import com.anddev741.BitData.infrastructure.config.CustomMetrics;
 import com.anddev741.BitData.infrastructure.web.BlockchainWebSocketConnector;
 
 import reactor.core.publisher.Flux;
@@ -34,7 +34,7 @@ public class BlockchainWebSocketConnectorTest {
         //Arrange
         ReactorNettyWebSocketClient mockClient = mock(ReactorNettyWebSocketClient.class);
         WebSocketSession mockSession = mock(WebSocketSession.class);
-        WebSocketMetrics mockMetrics = mock(WebSocketMetrics.class);
+        CustomMetrics mockMetrics = mock(CustomMetrics.class);
 
         WebSocketMessage msg1 = mock(WebSocketMessage.class);
         WebSocketMessage msg2 = mock(WebSocketMessage.class);
@@ -70,7 +70,7 @@ public class BlockchainWebSocketConnectorTest {
 
         ReactorNettyWebSocketClient mockClient = mock(ReactorNettyWebSocketClient.class);
         WebSocketSession mockSession = mock(WebSocketSession.class);
-        WebSocketMetrics mockMetrics = mock(WebSocketMetrics.class);
+        CustomMetrics mockMetrics = mock(CustomMetrics.class);
         WebSocketMessage msg = mock(WebSocketMessage.class);
         when(msg.getPayloadAsText()).thenReturn("tx_after_retry");
 

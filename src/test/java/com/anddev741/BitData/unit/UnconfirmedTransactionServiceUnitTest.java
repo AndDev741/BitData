@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 
 import com.anddev741.BitData.domain.model.UnconfirmedTransaction.UnconfirmedTransaction;
-import com.anddev741.BitData.infrastructure.config.WebSocketMetrics;
+import com.anddev741.BitData.infrastructure.config.CustomMetrics;
 import com.anddev741.BitData.infrastructure.web.BlockchainWebSocketConnector;
 
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,7 +28,7 @@ public class UnconfirmedTransactionServiceUnitTest {
     private BlockchainWebSocketConnector webSocket;
 
     @Mock
-    private WebSocketMetrics metrics;
+    private CustomMetrics metrics;
 
     private UnconfirmedTransactionService service;
 

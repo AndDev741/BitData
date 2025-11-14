@@ -8,7 +8,7 @@ import org.springframework.web.reactive.socket.WebSocketMessage;
 import org.springframework.web.reactive.socket.client.ReactorNettyWebSocketClient;
 
 import com.anddev741.BitData.domain.port.in.ReceiveTransactionsPort;
-import com.anddev741.BitData.infrastructure.config.WebSocketMetrics;
+import com.anddev741.BitData.infrastructure.config.CustomMetrics;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class BlockchainWebSocketConnector implements ReceiveTransactionsPort {
 
     private final ReactorNettyWebSocketClient client; 
     private final String BLOCKCHAIN_URI = "wss://ws.blockchain.info/inv";
-    private final WebSocketMetrics metrics;
+    private final CustomMetrics metrics;
 
     @Override
     public Flux<String> receiveUnconfirmedTransactions() {

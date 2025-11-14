@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import com.anddev741.BitData.domain.model.UnconfirmedTransaction.UnconfirmedTransaction;
-import com.anddev741.BitData.infrastructure.config.WebSocketMetrics;
+import com.anddev741.BitData.infrastructure.config.CustomMetrics;
 import com.anddev741.BitData.infrastructure.web.BlockchainWebSocketConnector;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,7 +22,7 @@ import reactor.core.publisher.Flux;
 public class UnconfirmedTransactionService {
 
     private final BlockchainWebSocketConnector webSocket;
-    private final WebSocketMetrics metrics;
+    private final CustomMetrics metrics;
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Bean
