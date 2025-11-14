@@ -11,6 +11,7 @@ public class WebSocketMetrics {
     private final Counter unconfirmedTransactionsReceived;
     private final Counter failedTransactionsCounter;
     private final Counter connectionRetries;
+    private final Counter rawTransactionSave;
 
     public WebSocketMetrics(MeterRegistry registry) {
         this.unconfirmedTransactionsReceived = Counter
@@ -27,6 +28,11 @@ public class WebSocketMetrics {
             .builder("bitdata_ws_retries")
             .description("Total of retries of the webSocket")
             .register(registry);
+
+        this.rawTransactionSave = Counter
+                .builder("raw_transactions_save")
+                .description("Total os raw transactions saved in the database")
+                .register(registry);
         
     }
 
@@ -40,5 +46,9 @@ public class WebSocketMetrics {
 
     public void incrementWebSocketRetries(){
         connectionRetries.increment();
+    }
+
+    public void incrementPersistedUnconfirmedTransactions() {
+        rawTransactionSave.increment();
     }
 }

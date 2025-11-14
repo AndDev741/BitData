@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  * Represents an unconfirmed Bitcoin transaction message received via WebSocket.
  */
 @Data
-@Document(collection = "unconfirmedTransaction")
+@Document
 public class UnconfirmedTransaction {
 
     @Id
