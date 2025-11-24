@@ -9,10 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.anddev741.BitData.domain.model.UnconfirmedTransaction.UnconfirmedTransaction;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Component
-@Slf4j
 public class TransactionProcessor {
 
     @Autowired
