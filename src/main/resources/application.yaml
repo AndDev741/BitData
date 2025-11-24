@@ -3,7 +3,7 @@ spring:
     name: BitData
   cloud:
     function:
-      definition: sendUnconfirmedTransactions;processTransactions
+      definition: sendUnconfirmedTransactions;processTransactions;sendAnalyticsToAdvancedProcess;advancedProcess
     stream:
       bindings:
         sendUnconfirmedTransactions-out-0:
@@ -12,6 +12,14 @@ spring:
 
         processTransactions-in-0:
           destination: processTransactions
+          contentType: application/json
+
+        sendAnalyticsToAdvancedProcess-out-0:
+          destination: advancedProcess
+          contentType: application/json
+
+        advancedProcess-in-0:
+          destination: advancedProcess
           contentType: application/json
 
       kafka:
