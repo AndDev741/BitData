@@ -12,6 +12,7 @@ import com.anddev741.BitData.infrastructure.config.CustomMetrics;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +24,8 @@ public class BlockchainWebSocketConnector implements ReceiveTransactionsPort {
     private final ReactorNettyWebSocketClient client; 
     private final String BLOCKCHAIN_URI = "wss://ws.blockchain.info/inv";
     private final CustomMetrics metrics;
+
+    private Disposable currentConnection;
 
     @Override
     public Flux<String> receiveUnconfirmedTransactions() {
@@ -44,7 +47,7 @@ public class BlockchainWebSocketConnector implements ReceiveTransactionsPort {
         return Flux.create(sink -> {
             log.info("[WEB] Connecting to Blockchain WebSocket...");
 
-            client.execute(URI.create(BLOCKCHAIN_URI), session -> {
+            this.currentConnection = client.execute(URI.create(BLOCKCHAIN_URI), session -> {
                 return session.send(
                     Mono.fromCallable(() -> session.textMessage("{\"op\":\"unconfirmed_sub\"}"))
                 )
@@ -66,6 +69,13 @@ public class BlockchainWebSocketConnector implements ReceiveTransactionsPort {
             })
             .subscribe();
         });
+    }
+
+    public void close() {
+        if(currentConnection != null && !currentConnection.isDisposed()) {
+            log.info("[WEB] Closing WebSocket connection manually...");
+            currentConnection.dispose();
+        }
     }
     
 }
