@@ -28,9 +28,9 @@ public class AnalyticsService {
     private final CustomMetrics customMetrics;
     private final StreamBridge streamBridge;
 
-    public void generateStatisticFromUnconfirmedTransaction(UnconfirmedTransaction transaction){
+    public Mono<Void> generateStatisticFromUnconfirmedTransaction(UnconfirmedTransaction transaction){
         //1 Step - Save the raw transaction in the database
-        persistUnconfirmedTransaction(transaction);
+        persistUnconfirmedTransaction(transaction).subscribe();
 
         //2 Step - Create the metadata and statistics of the transaction
         TransactionStatistics statistics = createMetadataAndStatistics(transaction);
@@ -43,19 +43,17 @@ public class AnalyticsService {
             log.info("[ANALYTICS] PERSISTED STATISTICS => {}", statistic.getId());
             sendAnalyticsToAdvancedProcess(statistic.getId());
         });
+
+        return persistedStatistics.then();
     }
 
-    private void persistUnconfirmedTransaction (UnconfirmedTransaction transaction){
-        try{
-            unconfirmedTransactionRepository.save(transaction).subscribe();
-            customMetrics.incrementPersistedUnconfirmedTransactions();
-        }catch (Exception e) {
-            log.error("[SERVICE] ERROR WHEN PERSISTING RAW TRANSACTION", e);
-            throw  e;
-        }
+    public Mono<Void> persistUnconfirmedTransaction (UnconfirmedTransaction transaction){
+        return unconfirmedTransactionRepository.save(transaction)
+                .doOnSuccess(t -> customMetrics.incrementPersistedUnconfirmedTransactions())
+                .then();
     }
 
-    private TransactionStatistics createMetadataAndStatistics (UnconfirmedTransaction transaction) {
+    public static TransactionStatistics createMetadataAndStatistics (UnconfirmedTransaction transaction) {
         TransactionStatistics statistics = new TransactionStatistics();
         Transaction t = transaction.getX();
 
