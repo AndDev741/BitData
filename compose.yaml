@@ -6,11 +6,21 @@ services:
     depends_on:
       - kafka
       - mongodb
+      - wallet-mock
     ports:
       - "7070:7070"
     environment:
       SPRING_PROFILES_ACTIVE: docker
       SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: kafka:9092
+      WALLET_API_BASE_URL: http://wallet-mock:8081
+
+  #Mock wallet API
+  wallet-mock:
+    build:
+      context: ./mock-wallet-service
+    container_name: wallet-mock
+    ports:
+      - "8081:8081"
 
   #Database
   mongodb:

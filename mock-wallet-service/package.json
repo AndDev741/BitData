@@ -1,0 +1,9 @@
+{
+  "name": "mock-wallet-service",
+  "version": "1.0.0",
+  "description": "Local mock for blockchain.info balance endpoint",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  }
+}
