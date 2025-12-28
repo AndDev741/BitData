@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.anddev741.BitData.domain.model.Wallet.Wallet;
+import com.anddev741.BitData.infrastructure.config.CustomMetrics;
 import com.anddev741.BitData.infrastructure.persistence.TransactionStatisticsRepository;
 
 @Service
@@ -22,15 +23,17 @@ public class AdvancedAnalyticsService {
 
     private final TransactionStatisticsRepository transactionStatisticsRepository;
     private final WebClient walletWebClient;
+    private final CustomMetrics customMetrics;
 
-    public void aggregateAdvancedAnalytics(String id) {
+    public Mono<Void> aggregateAdvancedAnalytics(String id) {
         // Get total in the wallet of all the receivers and senders and persist again
         // the Statistics
         log.info("STARTING ADVANCED ANALYTICS TO ID => {}", id);
 
-        transactionStatisticsRepository.findById(id)
+        return transactionStatisticsRepository.findById(id)
                 .doOnSuccess(statistic -> {
-                    statistic.getReceiverList().stream()
+                    try{
+                        statistic.getReceiverList().stream()
                             .forEach(receiver -> {
                                 if(receiver == null) return;
                                 fetchWallet(receiver.getReceiverAddress()).subscribe(wallet -> {
@@ -46,7 +49,7 @@ public class AdvancedAnalyticsService {
                                     transactionStatisticsRepository.save(statistic).subscribe();
                                 }, error -> log.error("Error fetching wallet for receiver {}", receiver.getReceiverAddress(), error));
                             });
-                    statistic.getSenderList().stream()
+                        statistic.getSenderList().stream()
                             .forEach(sender -> {
                                 if(sender == null) return;
                                 fetchWallet(sender.getSenderAddress()).subscribe(wallet -> {
@@ -62,7 +65,12 @@ public class AdvancedAnalyticsService {
                                     transactionStatisticsRepository.save(statistic).subscribe();
                                 }, error -> log.error("Error fetching wallet for sender {}", sender.getSenderAddress(), error));
                             });
-                }).subscribe();
+                        customMetrics.incrementAdvancedStatisticsPersisted();
+                    }catch(Exception e){
+                        log.error("Error processing advanced analytics => {}", statistic.getId());
+                        customMetrics.incrementAdvancedStatisticsFailed();
+                    }
+                }).then();
     }
 
     private Mono<Wallet> fetchWallet(String address) {

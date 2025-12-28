@@ -16,7 +16,7 @@ public class AdvancedProcessor {
     @Bean
     public Consumer<String> advancedProcess() {
         return analyticId -> {
-            advancedAnalyticsService.aggregateAdvancedAnalytics(analyticId);
+            advancedAnalyticsService.aggregateAdvancedAnalytics(analyticId).subscribe();
         };
     }
 

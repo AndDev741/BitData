@@ -13,6 +13,8 @@ public class CustomMetrics {
     private final Counter connectionRetries;
     private final Counter rawTransactionSave;
     private final Counter statisticsTransactionSave;
+    private final Counter advancedStatisticSaved;
+    private final Counter advancedStatisticFailed;
 
     public CustomMetrics(MeterRegistry registry) {
         this.unconfirmedTransactionsReceived = Counter
@@ -39,6 +41,16 @@ public class CustomMetrics {
                 .builder("bitdata_statistics_persisted")
                 .description("Total of statistics persisted in the database")
                 .register(registry);
+
+        this.advancedStatisticSaved = Counter
+                .builder("bitdata_advanced_statistics_persisted")
+                .description("Total of Advanced statistics persisted in the database")
+                .register(registry);
+
+        this.advancedStatisticFailed = Counter
+                .builder("bitdata_advanced_statistics_failed")
+                .description("Total of Advanced statistics that failed in the proccess")
+                .register(registry);
     }
 
     public void incrementUnconfirmedTransaction() {
@@ -59,5 +71,13 @@ public class CustomMetrics {
 
     public void incrementStatisticsPersisted() {
         statisticsTransactionSave.increment();
+    }
+
+    public void incrementAdvancedStatisticsPersisted() {
+        advancedStatisticSaved.increment();
+    }
+
+    public void incrementAdvancedStatisticsFailed() {
+        advancedStatisticFailed.increment();
     }
 }
