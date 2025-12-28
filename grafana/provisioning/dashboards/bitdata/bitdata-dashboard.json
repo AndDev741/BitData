@@ -636,7 +636,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "sum(rate(http_server_requests_seconds_count{job=\"spring-boot-app\",instance=~\"$instance\"}[1m]))",
+          "expr": "sum(rate(http_server_requests_seconds_count{job=\"spring-boot-app\",instance=~\"$instance\"}[1m])) or on() vector(0)",
           "legendFormat": "Requests / s",
           "refId": "A"
         }
@@ -730,7 +730,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{job=\"spring-boot-app\",instance=~\"$instance\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{job=\"spring-boot-app\",instance=~\"$instance\"}[5m])) by (le)) or on() vector(0)",
           "legendFormat": "p95 latency",
           "refId": "A"
         },
@@ -740,7 +740,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "histogram_quantile(0.50, sum(rate(http_server_requests_seconds_bucket{job=\"spring-boot-app\",instance=~\"$instance\"}[5m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(http_server_requests_seconds_bucket{job=\"spring-boot-app\",instance=~\"$instance\"}[5m])) by (le)) or on() vector(0)",
           "legendFormat": "p50 latency",
           "refId": "B"
         }
@@ -834,7 +834,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\",job=\"spring-boot-app\",instance=~\"$instance\"}[5m]))",
+          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"5..\",job=\"spring-boot-app\",instance=~\"$instance\"}[5m])) or on() vector(0)",
           "legendFormat": "5xx errors / s",
           "refId": "A"
         },
@@ -844,7 +844,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"4..\",job=\"spring-boot-app\",instance=~\"$instance\"}[5m]))",
+          "expr": "sum(rate(http_server_requests_seconds_count{status=~\"4..\",job=\"spring-boot-app\",instance=~\"$instance\"}[5m])) or on() vector(0)",
           "legendFormat": "4xx errors / s",
           "refId": "B"
         }
@@ -996,7 +996,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "reactor_netty_http_server_connections_active{job=\"spring-boot-app\",instance=~\"$instance\"}",
+          "expr": "reactor_netty_http_server_connections_active{job=\"spring-boot-app\",instance=~\"$instance\"} or on() vector(0)",
           "legendFormat": "Active connections",
           "refId": "A"
         },
@@ -1006,7 +1006,7 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "reactor_netty_http_server_connections_total{job=\"spring-boot-app\",instance=~\"$instance\"}",
+          "expr": "reactor_netty_http_server_connections_total{job=\"spring-boot-app\",instance=~\"$instance\"} or on() vector(0)",
           "legendFormat": "Total connections",
           "refId": "B"
         }
@@ -1042,7 +1042,7 @@
               }
             ]
           },
-          "unit": "Bps"
+          "unit": "s"
         },
         "overrides": []
       },
@@ -1072,8 +1072,8 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "rate(reactor_netty_http_server_data_sent_bytes_total{job=\"spring-boot-app\",instance=~\"$instance\"}[1m])",
-          "legendFormat": "Bytes sent/s",
+          "expr": "reactor_netty_http_server_response_time_seconds_sum{job=\"spring-boot-app\",instance=~\"$instance\"} / reactor_netty_http_server_response_time_seconds_count{job=\"spring-boot-app\",instance=~\"$instance\"}",
+          "legendFormat": "Avg response time",
           "refId": "A"
         },
         {
@@ -1082,12 +1082,12 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "rate(reactor_netty_http_server_data_received_bytes_total{job=\"spring-boot-app\",instance=~\"$instance\"}[1m])",
-          "legendFormat": "Bytes received/s",
+          "expr": "reactor_netty_http_server_response_time_seconds_max{job=\"spring-boot-app\",instance=~\"$instance\"}",
+          "legendFormat": "Max response time",
           "refId": "B"
         }
       ],
-      "title": "Netty Data Throughput",
+      "title": "Netty Response Time",
       "type": "timeseries"
     },
     {
@@ -1118,7 +1118,7 @@
               }
             ]
           },
-          "unit": "ops"
+          "unit": "bytes"
         },
         "overrides": []
       },
@@ -1148,12 +1148,22 @@
             "uid": "prometheus"
           },
           "exemplar": true,
-          "expr": "rate(reactor_netty_http_server_errors_total{job=\"spring-boot-app\",instance=~\"$instance\"}[5m])",
-          "legendFormat": "Server errors/s",
+          "expr": "reactor_netty_bytebuf_allocator_used_direct_memory{type=\"pooled\"}",
+          "legendFormat": "Direct memory used",
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "exemplar": true,
+          "expr": "reactor_netty_bytebuf_allocator_used_heap_memory{type=\"pooled\"}",
+          "legendFormat": "Heap memory used",
+          "refId": "B"
         }
       ],
-      "title": "Netty Errors",
+      "title": "Netty Buffer Memory",
       "type": "timeseries"
     },
     {
@@ -1281,6 +1291,270 @@
       ],
       "title": "Custom Metrics (5m rate)",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 55
+      },
+      "id": 15,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "exemplar": true,
+          "expr": "spring_cloud_stream_binder_kafka_offset",
+          "legendFormat": "{{topic}} / {{group}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Kafka Backlog (per topic/group)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 55
+      },
+      "id": 16,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "exemplar": true,
+          "expr": "max by (topic) (kafka_consumer_fetch_manager_records_lag{topic!=\"\",topic!~\"__.*\"})",
+          "legendFormat": "{{topic}} lag",
+          "refId": "A"
+        }
+      ],
+      "title": "Kafka Consumer Lag",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 63
+      },
+      "id": 17,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "exemplar": true,
+          "expr": "sum by (topic) (kafka_consumer_fetch_manager_records_consumed_rate{topic!=\"\",topic!~\"__.*\"})",
+          "legendFormat": "{{topic}} consumed/s",
+          "refId": "A"
+        }
+      ],
+      "title": "Kafka Consume Rate",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 20,
+            "lineInterpolation": "smooth",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 63
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "exemplar": true,
+          "expr": "sum by (topic) (kafka_producer_topic_record_send_rate{topic!=\"\",topic!~\"__.*\"})",
+          "legendFormat": "{{topic}} sent/s",
+          "refId": "A"
+        }
+      ],
+      "title": "Kafka Produce Rate",
+      "type": "timeseries"
     }
   ],
   "preload": false,
@@ -1322,5 +1596,5 @@
   "timezone": "",
   "title": "BitData - Spring Boot & WebFlux",
   "uid": "bitdata-main",
-  "version": 4
+  "version": 5
 }
