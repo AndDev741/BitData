@@ -3,6 +3,8 @@
 Reactive Spring Boot/WebFlux pipeline that ingests unconfirmed blockchain transactions, enriches them, and persists analytics with Kafka, MongoDB, and full Prometheus/Grafana observability.
 
 ## Architecture (at a glance)
+<img width="2568" height="1538" alt="image" src="https://github.com/user-attachments/assets/64c90399-7724-4e50-8884-1a2236da4916" />
+
 - **Ingress**: WebSocket connector pulls unconfirmed blockchain transactions.
 - **Reactive core**: WebFlux handlers + Reactor pipelines orchestrate validation, enrichment, and dispatch.
 - **Messaging**: Spring Cloud Stream (Kafka binder) with two queues:
@@ -49,6 +51,8 @@ Reactive Spring Boot/WebFlux pipeline that ingests unconfirmed blockchain transa
   - Lag: `kafka_consumer_fetch_manager_records_lag{topic}`
   - Consume rate: `kafka_consumer_fetch_manager_records_consumed_rate{topic}`
   - Produce rate: `kafka_producer_topic_record_send_rate{topic}`
+<img width="1926" height="857" alt="image" src="https://github.com/user-attachments/assets/6e34d98e-9041-44ac-bca3-5cf92642d4ec" />
+<img width="1926" height="708" alt="image" src="https://github.com/user-attachments/assets/627b7609-d7ee-4a3f-93cd-4852ee9e0228" />
 
 ## Running locally
 ```sh
